@@ -21,6 +21,7 @@ type Line =
     | Comment of string
     | Type of (MetricName*MetricType)
     | Metric of MetricLine
+    | Blank
   
 /// Defines the parsers for the Prometheus grammar     
 module PLang =
@@ -108,7 +109,7 @@ module PLang =
     let private typeLine = (``TYPE``>>.metric_name.>>.metric_type) |>> Line.Type
     let private helpLine = (``HELP``>>.metric_name.>>.doc_string) |>> Line.Help
     let private commentLine = rest_of_line |>> Line.Comment
-    
+    let emptyLine = ws0 >>.preturn Line.Blank
     /// Parser for a comment: TYPE, HELP, or plain comment
     let comment = comment_prefix >>.ws0 >>.(typeLine <|> helpLine <|> commentLine)
     /// Parser for a metric line
@@ -122,10 +123,19 @@ module PLang =
 module Prometheus =
     open FParsec
     open PLang
-    let private lineParser = ws0 >>.(comment <|> metric)
+    let private lineParser =
+        let line = ws0 >>.(comment <|> metric)
+        
+        ws0 >>.(line <|> emptyLine)
     /// Parse a single Prometheus line
     let parseLine line =
         let r = run lineParser line
         match r with
         | Success (x,_,_) -> x |> Result.Ok
-        | Failure (errorMsg, _,_) -> errorMsg |> Result.Error 
+        | Failure (errorMsg, _,_) -> errorMsg |> Result.Error
+        
+    let private split (sep : char) (s : string) = s.Split(sep)
+    let parseText (text:string) =
+        text
+        |> split '\n'
+        |> Array.map parseLine
