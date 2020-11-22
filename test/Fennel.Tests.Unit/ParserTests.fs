@@ -1,10 +1,9 @@
 // https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md
-module Tests
+module ParserTests
 
 open System
 open Fennel
 open Xunit
-open Fennel
 open Swensen.Unquote
 
 [<Fact>]
@@ -65,7 +64,7 @@ let ``A METRIC line: something_weird{problem="division by zero"} +Inf -3982045``
     test <@ expected = actual @>
     
 [<Fact>]
-let ``Read entire batch``() =
+let ``Read entire batch succeeds and expected number of lines parsed``() =
     let input = """
 # HELP http_requests_total The total number of HTTP requests.
 # TYPE http_requests_total counter
@@ -104,9 +103,28 @@ rpc_duration_seconds{quantile="0.99"} 76656
 rpc_duration_seconds_sum 1.7560473e+07
 rpc_duration_seconds_count 2693
 """
-    let result = Prometheus.parseText input
+    let lines = Prometheus.parseText input |> Array.toList
     let isOk (x : Result<Line,string>) = match x with | Ok _ -> true | Error _ -> false
-    test <@ (result |> Array.forall isOk) @>
+    test <@ (lines |> List.forall isOk) @>
+        
+    let result = lines |> Result.sequence
+    let countRemaining lines filter =
+        match lines with
+        | Error _ -> 0
+        | Ok lst -> lst |> List.filter filter |> List.length
+        
+    let count = countRemaining result
+    let blankLines = function | Blank _ -> true | _ -> false
+    let commentLines = function | Comment _ -> true | _ -> false
+    let helpLines = function | Help _ -> true | _ -> false
+    let typeLines = function | Type _ -> true | _ -> false
+    let metricLines = function | Metric _ -> true | _ -> false
+    
+    test <@ (count commentLines) = 5 @>
+    test <@ (count helpLines) = 3 @>
+    test <@ (count typeLines) = 3 @>
+    test <@ (count metricLines) = 20 @>
+    test <@ (count blankLines) = 7 @> // beginning and end have return carriage 5 + 2
     
     
     

@@ -1,27 +1,6 @@
 ﻿namespace Fennel
 open System
-//==============================
-// TYPES
-//==============================
-type MetricName = | MetricName of string
-type DocString = | DocString of string
-type MetricValue =
-    | FloatValue of float
-    | Nan
-type MetricType = | Counter | Gauge | Histogram | Summary | Untyped
-type Timestamp = | Timestamp of DateTimeOffset
-type MetricLine = {
-    Name : MetricName
-    Labels : (string*string) list
-    Value : MetricValue
-    Timestamp : Timestamp option
-}
-type Line =
-    | Help of (MetricName*DocString)
-    | Comment of string
-    | Type of (MetricName*MetricType)
-    | Metric of MetricLine
-    | Blank
+
   
 /// Defines the parsers for the Prometheus grammar     
 module PLang =
@@ -88,11 +67,11 @@ module PLang =
         (withTS <|> noTS) <?> "Timestamp"
     let private label_value = stringLiteral//(betweenQuotes text) <?> "Label value" //TODO: may need better parser for value
     let private a_label_pair =
-        ((ws0 >>.pname.>> ws0).>>(skipChar '=').>>.(ws0 >>.label_value)) <?> "Label name/value pair" 
+        ((ws0 >>.pname.>> ws0).>>(skipChar '=').>>.(ws0 >>.label_value)) |>> Label <?> "Label name/value pair" 
     let private label_pair_list = (sepBy a_label_pair (pchar ',')) <?> "Label pairs"
     let private metric_labels =
         let withLabels = (between (pchar '{') (pchar '}') label_pair_list)
-        let noLabels = (preturn []) 
+        let noLabels = (preturn Label.empty) 
         (withLabels <|> noLabels) <?> "Labels"
     
     //==============================
@@ -109,7 +88,10 @@ module PLang =
     let private typeLine = (``TYPE``>>.metric_name.>>.metric_type) |>> Line.Type
     let private helpLine = (``HELP``>>.metric_name.>>.doc_string) |>> Line.Help
     let private commentLine = rest_of_line |>> Line.Comment
+    
+    /// Parser for a blank line
     let emptyLine = ws0 >>.preturn Line.Blank
+    
     /// Parser for a comment: TYPE, HELP, or plain comment
     let comment = comment_prefix >>.ws0 >>.(typeLine <|> helpLine <|> commentLine)
     /// Parser for a metric line
@@ -120,22 +102,3 @@ module PLang =
         let timestampParser = (ws0>>.metric_timestamp)
         pipe4 nameParser labelsParser valueParser timestampParser mapToMetric
     
-module Prometheus =
-    open FParsec
-    open PLang
-    let private lineParser =
-        let line = ws0 >>.(comment <|> metric)
-        
-        ws0 >>.(line <|> emptyLine)
-    /// Parse a single Prometheus line
-    let parseLine line =
-        let r = run lineParser line
-        match r with
-        | Success (x,_,_) -> x |> Result.Ok
-        | Failure (errorMsg, _,_) -> errorMsg |> Result.Error
-        
-    let private split (sep : char) (s : string) = s.Split(sep)
-    let parseText (text:string) =
-        text
-        |> split '\n'
-        |> Array.map parseLine
