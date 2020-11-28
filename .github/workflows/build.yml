@@ -1,13 +1,13 @@
-name: Publish
+name: Build & Test
 
 on:
   push:
-    branches: [ master ]
+    branches: [ '*' ]
   pull_request:
-    branches: [ master ]
+    branches: [ '*' ]
 
 jobs:
-  publish:
+  build:
 
     runs-on: ubuntu-latest
 
@@ -34,13 +34,3 @@ jobs:
     - name: Run unit tests
       run: dotnet test --configuration Release
       working-directory: ./
-
-    # Pack
-    - name: Pack
-      run: dotnet pack --configuration Release
-      working-directory: ./src/Fennel/
-
-    # Publish
-    - name: Publish
-      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_DEPLOY_KEY }} --source https://api.nuget.org/v3/index.json
-      working-directory: ./src/Fennel/
