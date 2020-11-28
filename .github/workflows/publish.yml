@@ -1,0 +1,46 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Setup dotnet
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.403
+
+    # Tool Restore
+    - name: Tool Restore
+      run: dotnet tool restore
+      working-directory: ./
+    
+    # Build
+     - name: Build
+     run: dotnet build --configuration Release
+     working-directory: ./
+
+    # Test
+     - name: Run unit tests
+       run: dotnet test --configuration Release
+       working-directory: ./
+
+    # Pack
+     - name: Pack
+       run: dotnet pack --configuration Release
+       working-directory: ./src/Fennel/
+
+    # Publish
+     - name: Publish
+       run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_DEPLOY_KEY }} --source https://api.nuget.org/v3/index.json
+       working-directory: ./src/Fennel/
