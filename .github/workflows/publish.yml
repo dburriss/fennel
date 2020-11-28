@@ -27,8 +27,8 @@ jobs:
     
     # Build
     - name: Build
-     run: dotnet build --configuration Release
-     working-directory: ./
+      run: dotnet build --configuration Release
+      working-directory: ./
 
     # Test
     - name: Run unit tests
