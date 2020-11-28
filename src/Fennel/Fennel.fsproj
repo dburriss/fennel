@@ -8,7 +8,7 @@
     <Authors>Devon Burriss</Authors>
     <Description>A small library for converting between Prometheus log string and strong types and back.</Description>
     <Copyright>Devon Burriss 2020</Copyright>
-    <PackageLicenseUrl>https://github.com/dburriss/fennel/blob/master/LICENSE</PackageLicenseUrl>
+    <License>https://github.com/dburriss/fennel/blob/master/LICENSE</License>
     <PackageTags>Prometheus Logs Metrics Parser Serialize Observability</PackageTags>
   </PropertyGroup>
   <ItemGroup>
