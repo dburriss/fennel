@@ -56,6 +56,7 @@ module PLang =
             | "histogram" -> Histogram
             | "summary" -> Summary
             | "" -> Untyped
+            | t -> failwithf "Unknown metric TYPE: %s" t
     
     
     let private metric_value =
