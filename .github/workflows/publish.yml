@@ -26,21 +26,21 @@ jobs:
       working-directory: ./
     
     # Build
-     - name: Build
+    - name: Build
      run: dotnet build --configuration Release
      working-directory: ./
 
     # Test
-     - name: Run unit tests
-       run: dotnet test --configuration Release
-       working-directory: ./
+    - name: Run unit tests
+      run: dotnet test --configuration Release
+      working-directory: ./
 
     # Pack
-     - name: Pack
-       run: dotnet pack --configuration Release
-       working-directory: ./src/Fennel/
+    - name: Pack
+      run: dotnet pack --configuration Release
+      working-directory: ./src/Fennel/
 
     # Publish
-     - name: Publish
-       run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_DEPLOY_KEY }} --source https://api.nuget.org/v3/index.json
-       working-directory: ./src/Fennel/
+    - name: Publish
+      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_DEPLOY_KEY }} --source https://api.nuget.org/v3/index.json
+      working-directory: ./src/Fennel/
