@@ -1,5 +1,6 @@
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Fennel.CSharp.Tests
@@ -7,7 +8,7 @@ namespace Fennel.CSharp.Tests
     public class ApiTests
     {
         [Fact]
-        public void Test_ParseLine_For_Help()
+        public void ParseLine_For_Help()
         {
             var input = " #  HELP   http_requests_total    The total number of HTTP requests.";
             var result = Prometheus.ParseLine(input);
@@ -18,7 +19,7 @@ namespace Fennel.CSharp.Tests
         }
         
         [Fact]
-        public void Test_ParseLine_For_Comment()
+        public void ParseLine_For_Comment()
         {
             var input = "# A comment";
             var result = Prometheus.ParseLine(input);
@@ -28,7 +29,7 @@ namespace Fennel.CSharp.Tests
         }
         
         [Fact]
-        public void Test_ParseLine_For_Type()
+        public void ParseLine_For_Type()
         {
             var input = "     #  TYPE    http_requests_total counter";
             var result = Prometheus.ParseLine(input);
@@ -39,7 +40,7 @@ namespace Fennel.CSharp.Tests
         }
         
         [Fact]
-        public void Test_ParseLine_For_Metric()
+        public void ParseLine_For_Metric()
         {
             var input = "http_requests_total{method=\"post\",code=\"200\"} 1027 1395066363000";
             var result = Prometheus.ParseLine(input);
@@ -54,13 +55,68 @@ namespace Fennel.CSharp.Tests
         }
         
         [Fact]
-        public void Test_ParseLine_For_Blank()
+        public void ParseLine_For_Blank()
         {
             var input = "     ";
             var result = Prometheus.ParseLine(input);
             Assert.True(result.IsBlank);
         }
         
+        
+        [Fact]
+        public void ParseText()
+        {
+            var input =
+@"# HELP http_requests_total The total number of HTTP requests.
+# TYPE http_requests_total counter
+http_requests_total{method=""post"",code=""200""} 1027 1395066363000
+http_requests_total{method=""post"",code=""400""}    3 1395066363000
+
+# Escaping in label values:
+msdos_file_access_time_seconds{path=""C:\\DIR\\FILE.TXT"",error=""Cannot find file:\n \""FILE.TXT\"" ""} 1.458255915e9
+
+# Minimalistic line:
+metric_without_timestamp_and_labels 12.47
+
+# A weird metric from before the epoch:
+something_weird{problem=""division by zero""} +Inf -3982045";
+            var result = Prometheus.ParseText(input);
+            Assert.Equal(13, result.Count());
+        }
+        
+        [Fact]
+        public void CommentLine()
+        {
+            var actual = Prometheus.Comment("A comment");
+            var expected = "# A comment";
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void HelpLine()
+        {
+            var actual = Prometheus.Help("http_requests_total", "The total number of HTTP requests.");
+            var expected = "# HELP http_requests_total The total number of HTTP requests.";
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void MetricSimpleLine()
+        {
+            var actual = Prometheus.Metric("metric_without_timestamp_and_labels", 12.47);
+            var expected = "metric_without_timestamp_and_labels 12.47";
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void MetricLine()
+        {
+            var labels = new Dictionary<string, string>{ {"method", "post"}, {"code", "200"} };
+            var actual = Prometheus.Metric("http_requests_total", 1027, labels, DateTimeOffset.FromUnixTimeMilliseconds(1395066363000));
+            var expected = "http_requests_total{method=\"post\",code=\"200\"} 1027 1395066363000";
+            Assert.Equal(expected, actual);
+        }
+
         
     }
 }

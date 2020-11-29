@@ -9,6 +9,7 @@ module Prometheus =
         let line = ws0 >>.(comment <|> metric)
         
         ws0 >>.(line <|> emptyLine)
+        
     /// Parse a single Prometheus line
     let parseLine line =
         let r = run lineParser line

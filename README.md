@@ -18,7 +18,7 @@ todo
 
 ### Translating text to Types
 
-Assuming we have the following Prometheus logs:
+Assuming we have the following Prometheus logs as `input`:
 
 ```text
 # Finally a summary, which has a complex representation, too:
@@ -33,12 +33,63 @@ rpc_duration_seconds_sum 1.7560473e+07
 rpc_duration_seconds_count 2693
 ```
 
+You can break the result down into individually parsed lines.
+
+#### F#
+
 ```f#
+open Fennel
+
 let lines = Prometheus.parseText input
+```
+
+Each line has multiple possibilities:
+
+```f#
+match line with
+| Help (name, doc) -> printfn "Help line %A" (name, doc)
+| Comment txt -> printfn "Comment line %s" txt
+| Type (name, t) -> printfn "Type line %A" (name, t)
+| Metric m -> printfn "Metric line %A" m
+| Blank -> printfn "Blank line"
+```
+
+#### C#
+
+```c#
+using Fennel.CSharp;
+
+var lines = Prometheus.ParseText(input);
+```
+
+Or you can parse an individual line:
+
+```c#
+var input = "http_requests_total{method=\"post\",code=\"200\"} 1027 1395066363000";
+var result = Prometheus.ParseLine(input);
+if(result.IsMetric)
+{
+    var metric = result as Metric;
+}
 ```
 
 ### Metric to string
 
+You can also create correctly formatted Prometheus strings for `comment`, `help`, and `metric` lines.
+
+#### F#
+
 ```f#
-let metricLine = Prometheus.metric "http_requests_total" 1027. [("method","post");("code","200")] DateTimeOffset.UtcNow
+open Fennel
+
+let prometheusString = Prometheus.metric "http_requests_total" 1027. [("method","post");("code","200")] DateTimeOffset.UtcNow
+```
+
+#### C#
+
+```c#
+using Fennel.CSharp;
+
+var labels = new Dictionary<string, string>{ {"method", "post"}, {"code", "200"} };
+var prometheusString = Prometheus.Metric("http_requests_total", 1027, labels, DateTimeOffset.UtcNow);
 ```

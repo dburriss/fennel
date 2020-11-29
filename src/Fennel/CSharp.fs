@@ -1,6 +1,7 @@
 namespace Fennel.CSharp
 
 open System
+open System.Collections.Generic
 open Fennel
 
 module P = Prometheus
@@ -96,3 +97,17 @@ type Prometheus =
         match (rs |> Result.seq) with
         | Ok x -> x
         | Error err -> failwith err
+        
+    static member Comment(text) = P.comment text
+    static member Help(name, text) = P.help name text
+    static member Metric(name, value) = P.metricSimple name value
+    static member Metric(name, value, (labels : IDictionary<string,string>)) =
+        let ls = labels.Keys |> Seq.map (fun k -> (k, labels.[k])) |> Seq.toList
+        P.metricSansTime name value ls
+        
+    static member Metric(name, value, datetime) =
+        P.metric name value [] datetime
+        
+    static member Metric(name, value, (labels : IDictionary<string,string>), datetime) =
+        let ls = labels.Keys |> Seq.map (fun k -> (k, labels.[k])) |> Seq.toList
+        P.metric name value ls datetime
