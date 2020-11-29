@@ -12,7 +12,23 @@ The myth has it that Prometheus stole fire from Zeus by smuggling an ember in a 
 
 ## Nuget
 
-todo
+Available on [Nuget.org](https://www.nuget.org/packages/Fennel/)
+
+### Nuget Package Manger
+
+`Install-Package Fennel`
+
+### .NET CLI
+
+`dotnet add package Fennel`
+
+### PackageReference
+
+`<PackageReference Include="Fennel" />`
+
+### Paket
+
+`paket add Fennel`
 
 ## Usage
 
