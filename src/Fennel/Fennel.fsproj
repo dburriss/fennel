@@ -2,19 +2,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.0.1</Version>
+    <Version>0.1.0</Version>
     <PackageId>Fennel</PackageId>
     <Title>Fennel Prometheus Translator</Title>
     <Authors>Devon Burriss</Authors>
     <Description>A small library for converting between Prometheus log string and strong types and back.</Description>
     <Copyright>Devon Burriss 2020</Copyright>
+    <PackageProjectUrl>https://github.com/dburriss/fennel</PackageProjectUrl>
     <License>https://github.com/dburriss/fennel/blob/master/LICENSE</License>
     <PackageTags>Prometheus Logs Metrics Parser Serialize Observability</PackageTags>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Result.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="Parser.fs" />
     <Compile Include="Prometheus.fs" />
+    <Compile Include="CSharp.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FParsec" Version="1.1.1" />

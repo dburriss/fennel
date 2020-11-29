@@ -6,9 +6,9 @@
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Result.fs" />
     <Compile Include="ParserTests.fs" />
     <Compile Include="StringLineTests.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Fennel\Fennel.fsproj" />

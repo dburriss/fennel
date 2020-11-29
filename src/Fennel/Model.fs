@@ -36,6 +36,10 @@ module MetricValue =
     let asString = function
         | FloatValue v -> v.ToString()
         | Nan -> "NaN"
+        
+    let asValue = function
+        | FloatValue v -> Some v
+        | Nan -> None
 
 module MetricType =
     let asString = function

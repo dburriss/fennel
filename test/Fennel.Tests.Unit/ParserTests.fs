@@ -107,7 +107,7 @@ rpc_duration_seconds_count 2693
     let isOk (x : Result<Line,string>) = match x with | Ok _ -> true | Error _ -> false
     test <@ (lines |> List.forall isOk) @>
         
-    let result = lines |> Result.sequence
+    let result = lines |> Result.list
     let countRemaining lines filter =
         match lines with
         | Error _ -> 0
