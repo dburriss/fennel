@@ -10,6 +10,10 @@ Fennel is a simple library that speaks Promethean. If can translate prometheus l
 
 The myth has it that Prometheus stole fire from Zeus by smuggling an ember in a hollow fennel stalk.
 
+If you are wondering more about why I created this than about the name, it is simple. I was looking for something that just allowed me to create Prometheus log lines as strings. 
+I also wanted to be able to parse Prometheus logs. Circa 2019 when I looked for this all I found were libraries that tied very deeply into ASP.NET Core.
+I had been looking for an excuse to play with a parsing library like FParsec... and here we are.
+
 ## Nuget
 
 Available on [Nuget.org](https://www.nuget.org/packages/Fennel/)
