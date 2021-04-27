@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <PackageId>Fennel</PackageId>
     <Title>Fennel Prometheus Translator</Title>
     <Authors>Devon Burriss</Authors>
@@ -12,6 +12,8 @@
     <License>https://github.com/dburriss/fennel/blob/master/LICENSE</License>
     <PackageTags>Prometheus Logs Metrics Parser Serialize Observability</PackageTags>
     <PackageReleaseNotes>
+      # 0.3.0
+      - Changes Prometheus.CSharp ParseText to return IEnumerable of ILine instead of Line
       # 0.2.0
       - Adds Prometheus.CSharp namespace with a more C# friendly API
     </PackageReleaseNotes>
