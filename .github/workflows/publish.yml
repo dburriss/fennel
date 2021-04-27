@@ -42,5 +42,5 @@ jobs:
 
     # Publish
     - name: Publish
-      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_DEPLOY_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_DEPLOY_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
       working-directory: ./src/Fennel/
