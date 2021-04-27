@@ -95,7 +95,7 @@ type Prometheus =
         let rs = P.parseText text
         
         match (rs |> Result.seq) with
-        | Ok x -> x
+        | Ok x -> x |> Seq.map Prometheus.ToILine
         | Error err -> failwith err
         
     static member Comment(text) = P.comment text
