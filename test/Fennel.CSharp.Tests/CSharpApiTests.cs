@@ -80,8 +80,9 @@ metric_without_timestamp_and_labels 12.47
 
 # A weird metric from before the epoch:
 something_weird{problem=""division by zero""} +Inf -3982045";
-            var result = Prometheus.ParseText(input);
+            var result = Prometheus.ParseText(input).ToArray();
             Assert.Equal(13, result.Count());
+            Assert.True(result[0].IsHelp);
         }
         
         [Fact]
