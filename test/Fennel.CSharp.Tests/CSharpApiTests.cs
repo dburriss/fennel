@@ -102,6 +102,14 @@ something_weird{problem=""division by zero""} +Inf -3982045";
         }
 
         [Fact]
+        public void MetricTypeLine()
+        {
+            var actual = Prometheus.MetricType("http_requests_total", MetricTypeEnum.Counter);
+            var expected = "# TYPE http_requests_total counter";
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void MetricSimpleLine()
         {
             var actual = Prometheus.Metric("metric_without_timestamp_and_labels", 12.47);

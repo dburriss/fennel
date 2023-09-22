@@ -33,7 +33,16 @@ type Comment(text : string) =
         member this.IsBlank = false
         
 type MetricTypeEnum = | Counter = 1 | Gauge = 2 | Histogram = 3 | Summary = 4 | Untyped = 0
-          
+type MetricTypeEnumHelpers() =
+    static member ToMetricType (metricType: MetricTypeEnum) =
+        match metricType with
+        | MetricTypeEnum.Counter -> Counter
+        | MetricTypeEnum.Gauge -> Gauge
+        | MetricTypeEnum.Histogram -> Histogram
+        | MetricTypeEnum.Summary -> Summary
+        | MetricTypeEnum.Untyped -> Untyped
+        | _ -> failwith "Invalid MetricTypeEnum"
+
 type MetricType(metricName : MetricName, metricType : Fennel.MetricType) =
     member this.MetricName = MetricName.asString metricName
     member this.MetricType = metricType |> function
@@ -100,6 +109,7 @@ type Prometheus =
         
     static member Comment(text) = P.comment text
     static member Help(name, text) = P.help name text
+    static member MetricType(name, t) = P.typeHint name (t |> MetricTypeEnumHelpers.ToMetricType)
     static member Metric(name, value) = P.metricSimple name value
     static member Metric(name, value, (labels : IDictionary<string,string>)) =
         let ls = labels.Keys |> Seq.map (fun k -> (k, labels.[k])) |> Seq.toList
