@@ -17,7 +17,7 @@ namespace Fennel.CSharp.Tests
             Assert.Equal("http_requests_total", help.MetricName);
             Assert.Equal("The total number of HTTP requests.", help.Text);
         }
-        
+
         [Fact]
         public void ParseLine_For_Comment()
         {
@@ -27,7 +27,7 @@ namespace Fennel.CSharp.Tests
             var comment = result as Comment;
             Assert.Equal("A comment", comment.Text);
         }
-        
+
         [Fact]
         public void ParseLine_For_Type()
         {
@@ -38,7 +38,7 @@ namespace Fennel.CSharp.Tests
             Assert.Equal("http_requests_total", metricType.MetricName);
             Assert.Equal(MetricTypeEnum.Counter, metricType.MetricType);
         }
-        
+
         [Fact]
         public void ParseLine_For_Metric()
         {
@@ -53,7 +53,7 @@ namespace Fennel.CSharp.Tests
             Assert.Contains("code", metric.Labels);
             Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1395066363000), metric.Timestamp);
         }
-        
+
         [Fact]
         public void ParseLine_For_Blank()
         {
@@ -61,8 +61,8 @@ namespace Fennel.CSharp.Tests
             var result = Prometheus.ParseLine(input);
             Assert.True(result.IsBlank);
         }
-        
-        
+
+
         [Fact]
         public void ParseText()
         {
@@ -84,7 +84,7 @@ something_weird{problem=""division by zero""} +Inf -3982045";
             Assert.Equal(13, result.Count());
             Assert.True(result[0].IsHelp);
         }
-        
+
         [Fact]
         public void CommentLine()
         {
@@ -112,12 +112,12 @@ something_weird{problem=""division by zero""} +Inf -3982045";
         [Fact]
         public void MetricLine()
         {
-            var labels = new Dictionary<string, string>{ {"method", "post"}, {"code", "200"} };
+            var labels = new Dictionary<string, string> { { "method", "post" }, { "code", "200" } };
             var actual = Prometheus.Metric("http_requests_total", 1027, labels, DateTimeOffset.FromUnixTimeMilliseconds(1395066363000));
             var expected = "http_requests_total{method=\"post\",code=\"200\"} 1027 1395066363000";
             Assert.Equal(expected, actual);
         }
 
-        
+
     }
 }

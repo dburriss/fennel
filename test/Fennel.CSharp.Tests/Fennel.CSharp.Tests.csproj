@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Fennel\Fennel.fsproj" />
+        <ProjectReference Include="..\..\src\Fennel\Fennel.fsproj" />
     </ItemGroup>
 
 </Project>
