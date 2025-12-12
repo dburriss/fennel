@@ -34,7 +34,7 @@ jobs:
       
       # Setup multiple .NET SDK versions in a single step for efficiency
       # Using specific versions for reproducibility (not wildcards)
-      # Versions: .NET 6.0 LTS, .NET 8.0 LTS, .NET 10.0 (latest)
+      # Versions: .NET 6.0 LTS, .NET 8.0 LTS, .NET 9.0 (latest stable)
       - name: Setup .NET SDK (Multi-Version)
         uses: actions/setup-dotnet@v4
         with:
@@ -42,7 +42,7 @@ jobs:
           dotnet-version: |
             6.0.428
             8.0.416
-            10.0.101
+            9.0.101
           
           # Enable NuGet package caching for performance optimization
           cache: true
