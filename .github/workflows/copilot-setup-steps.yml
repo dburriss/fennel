@@ -1,0 +1,80 @@
+name: Copilot Setup Steps for Multi-Version .NET
+
+# This workflow sets up a multi-version .NET environment for GitHub Copilot
+# It configures .NET 6, 8, and 10 SDKs with proper caching and tooling
+on:
+  # Allow manual triggering from Actions tab
+  workflow_dispatch:
+  
+  # Run when this workflow file is modified to validate changes
+  push:
+    paths:
+      - '.github/workflows/copilot-setup-steps.yml'
+  
+  pull_request:
+    paths:
+      - '.github/workflows/copilot-setup-steps.yml'
+
+# Security: Use minimum required permissions
+# Only read access to repository contents is needed
+permissions:
+  contents: read
+
+jobs:
+  # Job name must be 'copilot-setup-steps' for GitHub Copilot recognition
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checkout with full history for better context
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      # Setup multiple .NET SDK versions in a single step for efficiency
+      # Using specific versions for reproducibility (not wildcards)
+      # Versions: .NET 6.0 LTS, .NET 8.0 LTS, .NET 10.0 (latest)
+      - name: Setup .NET SDK (Multi-Version)
+        uses: actions/setup-dotnet@v4
+        with:
+          # Multi-version syntax: separate versions with newlines
+          dotnet-version: |
+            6.0.428
+            8.0.416
+            10.0.101
+          
+          # Enable NuGet package caching for performance optimization
+          cache: true
+          
+          # Cache dependency path points to lock files for deterministic restores
+          # This ensures exact package versions are restored from cache
+          cache-dependency-path: '**/packages.lock.json'
+      
+      # Restore dependencies with locked mode for deterministic builds
+      # --locked-mode ensures exact versions from packages.lock.json are used
+      # This prevents supply chain attacks and ensures reproducible builds
+      - name: Restore dependencies (locked mode)
+        run: dotnet restore --locked-mode
+      
+      # Install dotnet-format tool globally for code formatting
+      # This is commonly used by Copilot for code formatting suggestions
+      - name: Install dotnet-format
+        run: dotnet tool install -g dotnet-format
+      
+      # Setup .NET environment variables for optimal operation
+      # DOTNET_ROOT: Ensures consistent SDK discovery
+      # DOTNET_CLI_TELEMETRY_OPTOUT: Disables telemetry for privacy/performance
+      - name: Configure .NET environment variables
+        run: |
+          echo "DOTNET_ROOT=$HOME/.dotnet" >> $GITHUB_ENV
+          echo "DOTNET_CLI_TELEMETRY_OPTOUT=1" >> $GITHUB_ENV
+      
+      # Validate the setup by building the solution
+      # This ensures all SDKs are properly configured and dependencies are resolved
+      - name: Build validation
+        run: dotnet build --configuration Release --no-restore
+      
+      # Optional: Display .NET SDK information for troubleshooting
+      - name: Display .NET info
+        run: dotnet --info
