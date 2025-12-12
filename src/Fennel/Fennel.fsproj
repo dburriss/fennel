@@ -17,6 +17,7 @@
       # 0.2.0
       - Adds Prometheus.CSharp namespace with a more C# friendly API
     </PackageReleaseNotes>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Result.fs" />
